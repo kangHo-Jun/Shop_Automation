@@ -218,13 +218,14 @@ class DoorBrowser:
             except:
                 self.driver = None
 
-        logger.info("[Browser] Launching Avast Browser for Scraping...")
-        avast_path = r"C:\Program Files\AVAST Software\Browser\Application\AvastBrowser.exe"
+        # V10: Use Chrome instead of Avast for better stability and headless support
+        logger.info("[Browser] Launching Chrome Browser for Scraping...")
+        chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
         profile_dir = config.base_dir / config.BROWSER_PROFILE_NAME
         debug_port = config.BROWSER_DEBUG_PORT
 
         cmd = [
-            avast_path,
+            chrome_path,
             f"--remote-debugging-port={debug_port}",
             f"--user-data-dir={profile_dir}",
             "--no-first-run",
@@ -236,18 +237,19 @@ class DoorBrowser:
             logger.info("[Browser] Running in HEADLESS mode (No Window)")
             cmd.insert(1, "--headless=new")
         subprocess.Popen(cmd)
-        time.sleep(3)
+        time.sleep(5)  # Increased wait time for Chrome initialization
 
         chrome_options = Options()
         chrome_options.add_experimental_option("debuggerAddress", f"127.0.0.1:{debug_port}")
 
-        print("[Browser] Connecting Driver...")
+        logger.info("[Browser] Connecting Driver...")
         try:
              service = Service(ChromeDriverManager(driver_version="142").install())
              self.driver = webdriver.Chrome(service=service, options=chrome_options)
-             print("✅ Browser Connected")
+             logger.info("[Browser] Browser Connected Successfully")
         except Exception as e:
-             print(f"[Error] Driver Init Failed: {e}")
+             logger.error(f"[Browser] Driver Init Failed: {e}")
+             error_handler.handle(e, context={"browser": "Chrome", "debug_port": debug_port}, severity=ErrorSeverity.HIGH)
              raise e
 
     def get_source(self):
