@@ -46,6 +46,7 @@ class Config:
         (self.DOWNLOADS_DIR / "estimate").mkdir(parents=True, exist_ok=True)
         
         # Browser
+        self.BROWSER_HEADLESS = os.getenv("BROWSER_HEADLESS", "false").lower() == "true"
         self.BROWSER_DEBUG_PORT = int(os.getenv("BROWSER_DEBUG_PORT", 9333))
         self.BROWSER_PROFILE_NAME = os.getenv("BROWSER_PROFILE_NAME", "avast_automation_profile")
         self.CHROMEDRIVER_VERSION = os.getenv("CHROMEDRIVER_VERSION", "142")
